@@ -6,8 +6,10 @@ using UnityEngine.UI;
 public class PlayerMovement : MonoBehaviour
 {
     public float playerSpeed = 5f;
+    public float shadowSpeed = 10f;
     public Rigidbody2D rb;
     public Rigidbody2D mrb;
+    public Rigidbody2D shadowrb;
     public Animator animator;
     public Animator manimator;
     public Collider2D hkdoor;
@@ -18,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     public Collider2D window;
     public Collider2D picture;
     public GameObject iprompt;
+    public GameObject shadow;
     public Text display;
     private string interracting = null;
     private Queue<string> mirrorwords;
@@ -28,6 +31,7 @@ public class PlayerMovement : MonoBehaviour
     private bool mirrori = false;
     private bool picturei = false;
     private bool windowi = false;
+    private bool shadowAct = false;
     public AudioSource audio;
     // Start is called before the first frame update
     void Start()
@@ -60,9 +64,17 @@ public class PlayerMovement : MonoBehaviour
         }
         animator.SetFloat("Facing", facing);
         manimator.SetFloat("Facing", facing);
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.E))
+        {
+            if (interracting == null)
+            {
+                iprompt.SetActive(false);
+                display.text = "Press E to interract";
+            }
+        }
         if(interracting == "mirror")
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.E))
             {
                 if(mirrorwords.Count != 0)
                 {
@@ -86,7 +98,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (interracting == "window")
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.E))
             {
                 if (windowwords.Count != 0)
                 {
@@ -94,6 +106,13 @@ public class PlayerMovement : MonoBehaviour
                     if (windowwords.Count == 3)
                     {
                         windowi = true;
+                        shadow.SetActive(true);
+                        shadowAct = true;
+                    }
+                    else if (windowwords.Count == 2)
+                    {
+                        shadowAct = false;
+                        shadow.SetActive(false);
                     }
                 }
                 else
@@ -103,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
-        if (interracting == "picture")
+        if (Input.GetKeyDown(KeyCode.Return) || interracting == "picture")
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
@@ -127,6 +146,11 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         rb.MovePosition(rb.position + movement * playerSpeed * Time.fixedDeltaTime);
+        if (shadowAct)
+        {
+            Vector2 shadowmove = new Vector2(0.1f, 0f);
+            shadowrb.MovePosition(shadowrb.position - shadowmove * shadowSpeed * Time.fixedDeltaTime);
+        }
     }
 
     public void Teleport(float x, float y)
@@ -182,6 +206,8 @@ public class PlayerMovement : MonoBehaviour
         this.SetMirrorQueue();
         this.SetWindowQueue();
         interracting = null;
+        shadowAct = false;
+        shadow.SetActive(false);
     }
     private void WindowInt()
     {
@@ -207,7 +233,7 @@ public class PlayerMovement : MonoBehaviour
         windowwords.Enqueue("You look outside.");
         windowwords.Enqueue("The sunset is quite beautiful.");
         windowwords.Enqueue("\"Who was that?!\"");
-        windowwords.Enqueue("You look again outside. Seeing nothing");
+        windowwords.Enqueue("You look again outside, seeing nothing.");
         windowwords.Enqueue("\"My eyes are playing tricks on me.\"");
     }
     public void SetPictureQueue()
@@ -215,7 +241,7 @@ public class PlayerMovement : MonoBehaviour
         picturewords = new Queue<string>();
         picturewords.Enqueue("You look at the photograph.");
         picturewords.Enqueue("Memories of the beach fill your head.");
-        picturewords.Enqueue("\"Were those scratches here before...\"");
+        picturewords.Enqueue("\"...\"");
     }
     private void CalculatePitch()
     {
