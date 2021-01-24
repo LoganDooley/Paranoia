@@ -25,6 +25,10 @@ public class PlayerMovement : MonoBehaviour
     private Queue<string> picturewords;
     Vector2 movement;
     float facing = -1f;
+    private bool mirrori = false;
+    private bool picturei = false;
+    private bool windowi = false;
+    public AudioSource audio;
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        this.CalculatePitch();
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
@@ -65,6 +70,7 @@ public class PlayerMovement : MonoBehaviour
                     if(mirrorwords.Count == 2)
                     {
                         manimator.SetBool("Blood", true);
+                        mirrori = true;
                     }
                     if(mirrorwords.Count == 1)
                     {
@@ -85,6 +91,10 @@ public class PlayerMovement : MonoBehaviour
                 if (windowwords.Count != 0)
                 {
                     display.text = windowwords.Dequeue();
+                    if (windowwords.Count == 3)
+                    {
+                        windowi = true;
+                    }
                 }
                 else
                 {
@@ -100,6 +110,10 @@ public class PlayerMovement : MonoBehaviour
                 if (picturewords.Count != 0)
                 {
                     display.text = picturewords.Dequeue();
+                    if (picturewords.Count == 1)
+                    {
+                        picturei = true;
+                    }
                 }
                 else
                 {
@@ -184,19 +198,40 @@ public class PlayerMovement : MonoBehaviour
         mirrorwords = new Queue<string>();
         mirrorwords.Enqueue("You look in the mirror.");
         mirrorwords.Enqueue("Beautiful eyes stare back.");
-        mirrorwords.Enqueue("What was that?");
-        mirrorwords.Enqueue("Must have been my imagination.");
+        mirrorwords.Enqueue("\"What was that?\"");
+        mirrorwords.Enqueue("\"Must have been my imagination.\"");
     }
     public void SetWindowQueue()
     {
         windowwords = new Queue<string>();
         windowwords.Enqueue("You look outside.");
         windowwords.Enqueue("The sunset is quite beautiful.");
+        windowwords.Enqueue("\"Who was that?!\"");
+        windowwords.Enqueue("You look again outside. Seeing nothing");
+        windowwords.Enqueue("\"My eyes are playing tricks on me.\"");
     }
     public void SetPictureQueue()
     {
         picturewords = new Queue<string>();
         picturewords.Enqueue("You look at the photograph.");
         picturewords.Enqueue("Memories of the beach fill your head.");
+        picturewords.Enqueue("\"Were those scratches here before...\"");
+    }
+    private void CalculatePitch()
+    {
+        float count = 1;
+        if (mirrori)
+        {
+            count -= 0.25f;
+        }
+        if (windowi)
+        {
+            count -= 0.25f;
+        }
+        if (picturei)
+        {
+            count -= 0.25f;
+        }
+        audio.pitch = count;
     }
 }

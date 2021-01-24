@@ -1786,6 +1786,7 @@ MonoBehaviour:
   picture: {fileID: 1480581524}
   iprompt: {fileID: 263549247}
   display: {fileID: 1251871547}
+  audio: {fileID: 2019199941}
 --- !u!212 &1497603697
 SpriteRenderer:
   m_ObjectHideFlags: 0
