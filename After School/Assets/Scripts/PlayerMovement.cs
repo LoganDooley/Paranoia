@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -13,12 +14,17 @@ public class PlayerMovement : MonoBehaviour
     public Collider2D khdoor;
     public Collider2D hbdoor;
     public Collider2D bhdoor;
+    public Collider2D mirror;
+    public GameObject iprompt;
+    public Text display;
+    private string interracting = null;
+    private Queue<string> mirrorwords = new Queue<string>();
     Vector2 movement;
     float facing = -1f;
     // Start is called before the first frame update
     void Start()
     {
-        
+        this.SetMirrorQueue();
     }
 
     // Update is called once per frame
@@ -43,6 +49,22 @@ public class PlayerMovement : MonoBehaviour
         }
         animator.SetFloat("Facing", facing);
         manimator.SetFloat("Facing", facing);
+        if(interracting == "mirror")
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                if(mirrorwords.Count != 0)
+                {
+                    display.text = mirrorwords.Dequeue();
+                }
+                else
+                {
+                    this.MirrorIntStop();
+                    display.text = "Press E to interract";
+                    this.SetMirrorQueue();
+                }
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -74,5 +96,31 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.position = new Vector3(8.65f, 20.42f, -3f);
         }
+        if(collision == mirror)
+        {
+            this.MirrorInt();
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision == mirror)
+        {
+            this.MirrorIntStop();
+        }
+    }
+    private void MirrorInt()
+    {
+        iprompt.SetActive(true);
+        interracting = "mirror";
+    }
+    private void MirrorIntStop()
+    {
+        iprompt.SetActive(false);
+        interracting = null;
+    }
+    public void SetMirrorQueue()
+    {
+        mirrorwords.Enqueue("You look in the mirror.");
+        mirrorwords.Enqueue("A beautiful face stares back.");
     }
 }
