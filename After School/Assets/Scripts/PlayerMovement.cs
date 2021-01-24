@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     public Rigidbody2D rb;
     public Rigidbody2D mrb;
     public Rigidbody2D shadowrb;
+    public Rigidbody2D shadow2rb;
     public Animator animator;
     public Animator manimator;
     public Collider2D hkdoor;
@@ -21,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     public Collider2D picture;
     public GameObject iprompt;
     public GameObject shadow;
+    public GameObject shadow2;
     public Text display;
     private string interracting = null;
     private Queue<string> mirrorwords;
@@ -32,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
     private bool picturei = false;
     private bool windowi = false;
     private bool shadowAct = false;
+    private bool shadow2Act = false;
     public AudioSource audio;
     // Start is called before the first frame update
     void Start()
@@ -132,6 +135,13 @@ public class PlayerMovement : MonoBehaviour
                     if (picturewords.Count == 1)
                     {
                         picturei = true;
+                        shadow2.SetActive(true);
+                        shadow2Act = true;
+                    }
+                    else if (picturewords.Count == 0)
+                    {
+                        shadow2Act = false;
+                        shadow2.SetActive(false);
                     }
                 }
                 else
@@ -150,6 +160,11 @@ public class PlayerMovement : MonoBehaviour
         {
             Vector2 shadowmove = new Vector2(0.1f, 0f);
             shadowrb.MovePosition(shadowrb.position - shadowmove * shadowSpeed * Time.fixedDeltaTime);
+        }
+        if (shadow2Act)
+        {
+            Vector2 shadow2move = new Vector2(0.1f, 0f);
+            shadow2rb.MovePosition(shadow2rb.position - shadow2move * shadowSpeed * Time.fixedDeltaTime);
         }
     }
 
@@ -171,7 +186,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (collision == hbdoor)
         {
-            transform.position = new Vector3(47.54f, 14.6f, -3f);
+            transform.position = new Vector3(47.54f, 11.6f, -3f);
         }
         if (collision == bhdoor)
         {
@@ -205,9 +220,12 @@ public class PlayerMovement : MonoBehaviour
         display.text = "Press E to interract";
         this.SetMirrorQueue();
         this.SetWindowQueue();
+        this.SetPictureQueue();
         interracting = null;
         shadowAct = false;
         shadow.SetActive(false);
+        shadow2Act = false;
+        shadow2.SetActive(false);
     }
     private void WindowInt()
     {
@@ -221,27 +239,54 @@ public class PlayerMovement : MonoBehaviour
     }
     public void SetMirrorQueue()
     {
-        mirrorwords = new Queue<string>();
-        mirrorwords.Enqueue("You look in the mirror.");
-        mirrorwords.Enqueue("Beautiful eyes stare back.");
-        mirrorwords.Enqueue("\"What was that?\"");
-        mirrorwords.Enqueue("\"Must have been my imagination.\"");
+        if (!mirrori)
+        {
+            mirrorwords = new Queue<string>();
+            mirrorwords.Enqueue("You look in the mirror.");
+            mirrorwords.Enqueue("There is something on your face.");
+            mirrorwords.Enqueue("");
+            mirrorwords.Enqueue("\"What was that?\"");
+            mirrorwords.Enqueue("\"Must have been my imagination.\"");
+        }
+        else
+        {
+            mirrorwords = new Queue<string>();
+            mirrorwords.Enqueue("It's just a mirror.");
+        }
     }
     public void SetWindowQueue()
     {
-        windowwords = new Queue<string>();
-        windowwords.Enqueue("You look outside.");
-        windowwords.Enqueue("The sunset is quite beautiful.");
-        windowwords.Enqueue("\"Who was that?!\"");
-        windowwords.Enqueue("You look again outside, seeing nothing.");
-        windowwords.Enqueue("\"My eyes are playing tricks on me.\"");
+        if (!windowi)
+        {
+            windowwords = new Queue<string>();
+            windowwords.Enqueue("You look outside.");
+            windowwords.Enqueue("The sunset is kind of cool.");
+            windowwords.Enqueue("");
+            windowwords.Enqueue("\"Who was that?!\"");
+            windowwords.Enqueue("You look outside again. Nobody is there.");
+            windowwords.Enqueue("\"My eyes are playing tricks on me.\"");
+        }
+        else
+        {
+            windowwords = new Queue<string>();
+            windowwords.Enqueue("Nobody is there.");
+        }
     }
     public void SetPictureQueue()
     {
-        picturewords = new Queue<string>();
-        picturewords.Enqueue("You look at the photograph.");
-        picturewords.Enqueue("Memories of the beach fill your head.");
-        picturewords.Enqueue("\"...\"");
+        if (!picturei)
+        {
+            picturewords = new Queue<string>();
+            picturewords.Enqueue("You look at the photograph.");
+            picturewords.Enqueue("\"The beach was always so much fun\"");
+            picturewords.Enqueue("");
+            picturewords.Enqueue("\"...\"");
+        }
+        else
+        {
+            picturewords = new Queue<string>();
+            picturewords.Enqueue("It's a picture of you at the beach.");
+        }
     }
     private void CalculatePitch()
     {
