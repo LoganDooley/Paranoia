@@ -15,16 +15,22 @@ public class PlayerMovement : MonoBehaviour
     public Collider2D hbdoor;
     public Collider2D bhdoor;
     public Collider2D mirror;
+    public Collider2D window;
+    public Collider2D picture;
     public GameObject iprompt;
     public Text display;
     private string interracting = null;
-    private Queue<string> mirrorwords = new Queue<string>();
+    private Queue<string> mirrorwords;
+    private Queue<string> windowwords;
+    private Queue<string> picturewords;
     Vector2 movement;
     float facing = -1f;
     // Start is called before the first frame update
     void Start()
     {
         this.SetMirrorQueue();
+        this.SetWindowQueue();
+        this.SetPictureQueue();
     }
 
     // Update is called once per frame
@@ -59,9 +65,38 @@ public class PlayerMovement : MonoBehaviour
                 }
                 else
                 {
-                    this.MirrorIntStop();
-                    display.text = "Press E to interract";
+                    this.IntStop();
                     this.SetMirrorQueue();
+                }
+            }
+        }
+        if (interracting == "window")
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                if (windowwords.Count != 0)
+                {
+                    display.text = windowwords.Dequeue();
+                }
+                else
+                {
+                    this.IntStop();
+                    this.SetWindowQueue();
+                }
+            }
+        }
+        if (interracting == "picture")
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                if (picturewords.Count != 0)
+                {
+                    display.text = picturewords.Dequeue();
+                }
+                else
+                {
+                    this.IntStop();
+                    this.SetPictureQueue();
                 }
             }
         }
@@ -100,27 +135,58 @@ public class PlayerMovement : MonoBehaviour
         {
             this.MirrorInt();
         }
+        if(collision == window)
+        {
+            this.WindowInt();
+        }
+        if(collision == picture)
+        {
+            this.PictureInt();
+        }
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision == mirror)
-        {
-            this.MirrorIntStop();
-        }
+        this.IntStop();
     }
     private void MirrorInt()
     {
         iprompt.SetActive(true);
         interracting = "mirror";
     }
-    private void MirrorIntStop()
+    private void IntStop()
     {
         iprompt.SetActive(false);
+        display.text = "Press E to interract";
+        this.SetMirrorQueue();
+        this.SetWindowQueue();
         interracting = null;
+    }
+    private void WindowInt()
+    {
+        iprompt.SetActive(true);
+        interracting = "window";
+    }
+    private void PictureInt()
+    {
+        iprompt.SetActive(true);
+        interracting = "picture";
     }
     public void SetMirrorQueue()
     {
+        mirrorwords = new Queue<string>();
         mirrorwords.Enqueue("You look in the mirror.");
         mirrorwords.Enqueue("A beautiful face stares back.");
+    }
+    public void SetWindowQueue()
+    {
+        windowwords = new Queue<string>();
+        windowwords.Enqueue("You look outside.");
+        windowwords.Enqueue("The sunset is quite beautiful.");
+    }
+    public void SetPictureQueue()
+    {
+        picturewords = new Queue<string>();
+        picturewords.Enqueue("You look at the photograph.");
+        picturewords.Enqueue("Memories of the beach fill your head.");
     }
 }
