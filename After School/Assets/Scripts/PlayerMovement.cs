@@ -62,6 +62,14 @@ public class PlayerMovement : MonoBehaviour
                 if(mirrorwords.Count != 0)
                 {
                     display.text = mirrorwords.Dequeue();
+                    if(mirrorwords.Count == 2)
+                    {
+                        manimator.SetBool("Blood", true);
+                    }
+                    if(mirrorwords.Count == 1)
+                    {
+                        manimator.SetBool("Blood", false);
+                    }
                 }
                 else
                 {
@@ -175,7 +183,9 @@ public class PlayerMovement : MonoBehaviour
     {
         mirrorwords = new Queue<string>();
         mirrorwords.Enqueue("You look in the mirror.");
-        mirrorwords.Enqueue("A beautiful face stares back.");
+        mirrorwords.Enqueue("Beautiful eyes stare back.");
+        mirrorwords.Enqueue("What was that?");
+        mirrorwords.Enqueue("Must have been my imagination.");
     }
     public void SetWindowQueue()
     {
